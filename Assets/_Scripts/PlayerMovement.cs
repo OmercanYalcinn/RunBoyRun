@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float laneDistance = 1f; // There is 3 lanes and the ground is 5f long so the distance between lanes is 1f
     [SerializeField] private int currentLane = 0;   //Center lane by default, -1 and +1 are the other two
     private Rigidbody _rigidbody;
+    private bool isMoving = true;
 
     void Start()
     {
@@ -13,11 +14,25 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void Update(){
-        //constant forward movement - pay attention here we are not adding any foce or sth like that, just using same vector to move on constant speed
-        _rigidbody.velocity = -Vector3.right * forwardSpeed;     //Vector3.right is shorthand for the vector (1, 0, 0)
+        if (isMoving)
+        {
+            //constant forward movement - pay attention here we are not adding any foce or sth like that, just using same vector to move on constant speed
+            _rigidbody.velocity = -Vector3.right * forwardSpeed;     //Vector3.right is shorthand for the vector (1, 0, 0)
 
-        //the method for right and left movements
-        RightLeftInput();
+            //the method for right and left movements
+            RightLeftInput();
+        }
+    }
+
+     public void StartMovement()
+    {
+        isMoving = true;
+    }
+
+    public void StopMovement()
+    {
+        isMoving = false;
+        _rigidbody.velocity = Vector3.zero; // Stop movement
     }
 
     private void RightLeftInput(){
