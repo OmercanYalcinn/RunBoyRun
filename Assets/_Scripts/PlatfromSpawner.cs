@@ -6,16 +6,19 @@ public class PlatfromSpawner : MonoBehaviour
     public Transform platformPrefabTransform;   // Reference to player position
     [SerializeField] private Vector3 nextSpawnPoint;    // Position to spawn the next platform
     [SerializeField] private float platformLength = 25;     //The ground is (25,1,5)
+    [SerializeField] private bool isSpawning = false;
 
     void Start(){
         nextSpawnPoint = Vector3.zero;    // Vector3.zero form
     }
 
     void OnTriggerEnter(Collider other){
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isSpawning)
         {
+            isSpawning = true;
             Debug.Log("Trigger Happend");
-            SpawnPoint();    
+            SpawnPoint();
+            isSpawning = false;
         }
     }
 
