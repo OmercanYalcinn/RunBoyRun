@@ -28,7 +28,13 @@ public class PlatfromSpawner : MonoBehaviour
         
         //now update the next spawn point, negative is working because the camera angle at the beggining is act like that way LOL 
         nextSpawnPoint.x -= platformLength;
-        Instantiate(platformPrefabs[platformIndex], nextSpawnPoint, Quaternion.identity);
+        GameObject newPlatform = Instantiate(platformPrefabs[platformIndex], nextSpawnPoint, Quaternion.identity);
+        
+        PlatfromSpawner spawner = newPlatform.GetComponentInChildren<PlatfromSpawner>();
+        if (spawner != null && !spawner.enabled)
+        {
+            spawner.enabled = true;
+        }
 
         Destroy(transform.parent.gameObject, 5f);
     }
