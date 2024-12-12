@@ -1,41 +1,72 @@
 using UnityEngine;
 
 public class PlatfromSpawner : MonoBehaviour
-{
-    [SerializeField] private GameObject[] platformPrefabs;  // array to hold platform types
-    public Transform platformPrefabTransform;   // Reference to player position
-    [SerializeField] private Vector3 nextSpawnPoint;    // Position to spawn the next platform
-    [SerializeField] private float platformLength = 25;     //The ground is (25,1,5)
-    [SerializeField] private bool isSpawning = false;
+{   
+    [Header("Platform Prefabs")]
+    public GameObject[] platformPrefabs; // Array to store platform prefabs
+    public Transform currentPlatform;    // Reference to the current platform
 
-    void Start(){
-        nextSpawnPoint = Vector3.zero;    // Vector3.zero form
-    }
+    [Header("Spawn Settings")]
+    public float platformSpacing = 5f;  // Distance between platforms along the X-axis
+    private Vector3 nextSpawnPosition;   // Position to spawn the next platform
 
-    void OnTriggerEnter(Collider other){
-        if (other.CompareTag("Player") && !isSpawning)
+    private void Start()
+    {
+        // Initialize the next spawn position
+        if (currentPlatform != null)
         {
-            isSpawning = true;
-            Debug.Log("Trigger Happend");
-            SpawnPoint();
-            isSpawning = false;
+            nextSpawnPosition = currentPlatform.position + new Vector3(-platformSpacing, 0, 0);
+        }
+        else
+        {
+            Debug.LogError("Current Platform is not assigned in the Inspector.");
         }
     }
 
-    private void SpawnPoint(){
-        // To select randomly one of the platform prefabs
-        int platformIndex = Random.Range(0, platformPrefabs.Length); // For now with the two types of platforms, 1/2
-        
-        //now update the next spawn point, negative is working because the camera angle at the beggining is act like that way LOL 
-        nextSpawnPoint.x -= platformLength;
-        GameObject newPlatform = Instantiate(platformPrefabs[platformIndex], nextSpawnPoint, Quaternion.identity);
-        
-        PlatfromSpawner spawner = newPlatform.GetComponentInChildren<PlatfromSpawner>();
-        if (spawner != null && !spawner.enabled)
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the trigger zone has been hit
+        if (other.gameObject.CompareTag("Player"))
         {
-            spawner.enabled = true;
+            SpawnPlatformMethod();
+            DestroyPrevPlatform();
+            UpdatePlatformPosition();
         }
-
-        Destroy(transform.parent.gameObject, 5f);
     }
+
+    private void SpawnPlatformMethod()
+    {
+        if (platformPrefabs.Length > 0)
+        {
+            // Choose a random platform prefab
+            int randomIndex = Random.Range(0, platformPrefabs.Length);
+
+            // Instantiate the new platform
+            Instantiate(platformPrefabs[randomIndex], nextSpawnPosition, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogError("No platform prefabs assigned in the Inspector.");
+        }
+    }
+
+    private void DestroyPrevPlatform()
+    {
+        // Destroy the previous platform after 5 seconds
+        if (currentPlatform != null)
+        {
+            Destroy(currentPlatform.gameObject, 5f);
+        }
+        else
+        {
+            Debug.LogWarning("No previous platform to destroy.");
+        }
+    }
+
+    private void UpdatePlatformPosition()
+    {
+        // Update the next spawn position
+        nextSpawnPosition += new Vector3(-platformSpacing, 0, 0);
+    }
+
 }
